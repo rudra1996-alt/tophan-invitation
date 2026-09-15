@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Royal Engagement | Tophan & Shibani</title>
+  <meta name="description" content="We invite you to celebrate the Royal Engagement ceremony of Tophan & Shibani." />
+
+  <!-- Open Graph / WhatsApp Preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Tophan & Shibani | Royal Engagement" />
+  <meta property="og:description" content="Join us to celebrate our special day at Hotel Swosti Mandap, Puri." />
+  <meta property="og:image" content="images/couple-caricature.png" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Google Fonts: Royal Rajasthani & Serif styling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Marcellus&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            maroon: "#6A0D25",
+            maroonDark: "#400412",
+            royalBlue: "#1B1F38",
+            gold: "#B08D57",
+            goldLight: "#D4AF6A",
+            amberGold: "#F59E0B",
+            sandIvory: "#FDFBF7"
+          },
+          fontFamily: {
+            royal: ["'Cinzel Decorative'", "Georgia", "serif"],
+            serif: ["'Marcellus'", "Georgia", "serif"],
+            sans: ["'Montserrat'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #fdfbf7;
+    }
+
+    body.locked {
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .gold-text {
+      background: linear-gradient(90deg, #9a753d, #e8c98a, #d4af6a, #9a753d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .rajasthani-pattern {
+      background-color: #fdfbf7;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(106, 13, 37, 0.06) 0%, transparent 60%),
+        radial-gradient(circle at 10% 90%, rgba(212, 175, 106, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(106, 13, 37, 0.05) 0%, transparent 40%);
+    }
+
+    /* ================= 3D RAJASTHANI PALACE DOOR OPENING ================= */
+
+    #doorOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      perspective: 1600px;
+      overflow: hidden;
+      background: #1B1F38;
+      transition: visibility 1.8s ease 1.2s;
+    }
+
+    #doorOverlay.open {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .door-panel {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      transition: transform 1.6s cubic-bezier(0.65, 0, 0.35, 1);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      transform-style: preserve-3d;
+    }
+
+    /* Left Palace Door */
+    .door-left {
+      transform-origin: left center;
+      background: 
+        radial-gradient(circle at right center, rgba(0,0,0,0.4), transparent 70%),
+        linear-gradient(135deg, #400412 0%, #6A0D25 50%, #2E030D 100%);
+      border-right: 4px solid #D4AF6A;
+    }
+
+    /* Right Palace Door */
+    .door-right {
+      transform-origin: right center;
+      background: 
+        radial-gradient(circle at left center, rgba(0,0,0,0.4), transparent 70%),
+        linear-gradient(225deg, #400412 0%, #6A0D25 50%, #2E030D 100%);
+      border-left: 4px solid #D4AF6A;
+    }
+
+    /* Jharokha Arch Carvings inside Doors */
+    .door-arch {
+      position: absolute;
+      inset: 20px;
+      border: 2px solid rgba(212, 175, 106, 0.5);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      padding: 30px 10px;
+      background-image: radial-gradient(circle, rgba(212, 175, 106, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .door-panel-ornament {
+      width: 80%;
+      height: 110px;
+      border: 1px dashed rgba(212, 175, 106, 0.4);
+      border-radius: 8px;
+    }
+
+    /* Swing open transformations */
+    #doorOverlay.open .door-left {
+      transform: rotateY(-105deg);
+    }
+
+    #doorOverlay.open .door-right {
+      transform: rotateY(105deg);
+    }
+
+    /* Center Royal Seal/Lock */
+    .door-seal-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 110;
+      text-align: center;
+      transition: transform 0.6s ease, opacity 0.5s ease;
+    }
+
+    #doorOverlay.open .door-seal-container {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+      pointer-events: none;
+    }
+
+    .royal-seal {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 3px solid #F59E0B;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 35% 30%, #ffd984, #b08d57 65%, #634316 100%);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 2px 6px rgba(255, 255, 255, 0.6);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      transition: transform 0.3s ease;
+    }
+
+    .royal-seal:hover {
+      transform: scale(1.06);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(212, 175, 106, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(245, 158, 11, 0.7); }
+    }
+
+    /* ================= HERO & SCRATCH CARD ================= */
+
+    .scratch-wrap {
+      position: relative;
+      display: inline-block;
+      min-width: 290px;
+    }
+
+    .scratch-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 1.5rem;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    /* Main Content Reveal */
+    #mainContent {
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 1.4s ease 0.4s, transform 1.4s ease 0.4s;
+    }
+
+    #mainContent.revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Floating Music Toggle */
+    #musicToggle {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 40;
+      width: 52px;
+      height: 52px;
+      border-radius: 9999px;
+      background: #6A0D25;
+      color: #D4AF6A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      border: 1px solid rgba(212, 175, 106, 0.5);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    #musicToggle:hover {
+      transform: scale(1.08);
+    }
+
+    /* Floating animation */
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .gentle-float {
+      animation: gentleFloat 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="text-maroonDark font-sans locked" id="bodyEl">
+
+  <!-- ================= RAJASTHANI PALACE DOORS SPLIT ================= -->
+  <div id="doorOverlay">
+    <!-- Left Door -->
+    <div class="door-panel door-left">
+      <div class="door-arch">
+        <div class="door-panel-ornament"></div>
+        <div class="text-goldLight font-royal text-2xl tracking-widest opacity-40">✦</div>
+        <div class="door-panel-ornament"></div>
+      </div>
+    </div>
+
+    <!-- Right Door -->
+    <div class="door-panel door-right">
+      <div class="door-arch">
+        <div class="door-panel-ornament"></div>
+        <div class="text-goldLight font-royal text-2xl tracking-widest opacity-40">✦</div>
+        <div class="door-panel-ornament"></div>
+      </div>
+    </div>
+
+    <!-- Center Royal Emblem / Lock Button -->
+    <div class="door-seal-container">
+      <p class="text-goldLight font-serif tracking-[0.3em] uppercase text-xs mb-4 drop-shadow">
+        Padharo Mhare Desh
+      </p>
+      <button id="doorOpenBtn" class="royal-seal" aria-label="Open the royal palace doors">
+        <span class="font-royal text-2xl text-maroonDark font-bold tracking-wider">T &amp; S</span>
+        <span class="text-[9px] uppercase tracking-widest text-maroonDark font-semibold mt-1">Unlock</span>
+      </button>
+      <p class="text-amber-100/80 font-serif text-sm mt-4 tracking-wider">
+        Tap the royal seal to open
+      </p>
+    </div>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop preload="none">
+    <source src="audio/shehnai-flute.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Music Floating Button -->
+  <button id="musicToggle" class="hidden" aria-label="Toggle background music">
+    🔊
+  </button>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <div id="mainContent" class="rajasthani-pattern min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-gold/30">
+      <nav class="max-w-5xl mx-auto px-5 py-3.5 flex items-center justify-between">
+        <a href="#home" class="font-royal text-xl text-maroon font-bold">
+          T &amp; S
+        </a>
+        <div class="flex gap-6 text-sm font-serif">
+          <a href="#home" class="hover:text-gold transition">Welcome</a>
+          <a href="#ceremony" class="hover:text-gold transition">Ceremony</a>
+          <a href="#location" class="hover:text-gold transition">Venue Map</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-32 pb-16 px-5 text-center">
+      <div class="max-w-4xl mx-auto">
+
+        <p class="uppercase tracking-[0.35em] text-gold font-serif text-sm mb-3">
+          Shree Ganeshay Namah
+        </p>
+
+        <p class="font-serif text-maroon text-base sm:text-lg mb-2 italic">
+          With the blessings of our parents and family
+        </p>
+
+        <h1 class="font-royal text-4xl sm:text-6xl md:text-7xl gold-text mb-4 tracking-wide">
+          Tophan &amp; Shibani
+        </h1>
+
+        <div class="flex items-center justify-center gap-3 mb-6">
+          <span class="h-px w-16 bg-gold/50"></span>
+          <span class="text-maroon font-serif text-lg tracking-widest uppercase">Are Getting Engaged</span>
+          <span class="h-px w-16 bg-gold/50"></span>
+        </div>
+
+        <!-- Caricature Placeholder (Supply image later at images/couple-caricature.png) -->
+        <div class="flex justify-center my-8">
+          <div class="relative">
+            <div class="absolute inset-0 bg-gold/15 rounded-full blur-2xl"></div>
+            <img
+              src="images/couple-caricature.png"
+              alt="Tophan & Shibani Caricature"
+              onerror="this.style.display='none'; document.getElementById('placeholderBox').classList.remove('hidden');"
+              class="relative w-72 sm:w-80 md:w-96 max-h-[460px] object-contain mx-auto gentle-float"
+            />
+            <!-- Fallback box shown if image is not yet uploaded -->
+            <div id="placeholderBox" class="hidden border-2 border-dashed border-gold/50 rounded-3xl p-10 bg-white/70 max-w-sm mx-auto">
+              <span class="text-4xl block mb-2">💍</span>
+              <p class="font-serif text-maroon text-lg font-bold">Tophan &amp; Shibani</p>
+              <p class="text-xs text-gray-500 mt-1">Place your couple caricature image in <code class="text-maroon">images/couple-caricature.png</code></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SCRATCH CARD (DATE REVEAL FIRST) ================= -->
+        <div class="mt-8 mb-4">
+          <p class="uppercase tracking-[0.3em] text-gold font-serif text-sm font-semibold">
+            Save The Auspicious Date
+          </p>
+          <p class="text-gray-500 font-sans text-xs sm:text-sm mt-1 mb-5">
+            ✦ Scratch the golden seal below to reveal the date ✦
+          </p>
+        </div>
+
+        <div class="scratch-wrap inline-block mx-auto p-3 rounded-3xl bg-white/50 border border-gold/30 shadow-md">
+          <div class="scratch-content px-4 py-5">
+            <p class="font-serif text-2xl sm:text-3xl text-maroon font-bold mb-4 tracking-wide">
+              September 23, 2026
+            </p>
+
+            <!-- Countdown Timer -->
+            <div id="countdown" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-md mx-auto">
+              <div class="bg-white/80 border border-gold/40 rounded-2xl p-3 shadow-sm">
+                <div id="days" class="font-royal text-2xl sm:text-3xl text-gold">00</div>
+                <div class="text-[10px] uppercase font-sans tracking-wider mt-1 text-gray-600">Days</div>
+              </div>
+              <div class="bg-white/80 border border-gold/40 rounded-2xl p-3 shadow-sm">
+                <div id="hours" class="font-royal text-2xl sm:text-3xl text-gold">00</div>
+                <div class="text-[10px] uppercase font-sans tracking-wider mt-1 text-gray-600">Hours</div>
+              </div>
+              <div class="bg-white/80 border border-gold/40 rounded-2xl p-3 shadow-sm">
+                <div id="minutes" class="font-royal text-2xl sm:text-3xl text-gold">00</div>
+                <div class="text-[10px] uppercase font-sans tracking-wider mt-1 text-gray-600">Mins</div>
+              </div>
+              <div class="bg-white/80 border border-gold/40 rounded-2xl p-3 shadow-sm">
+                <div id="seconds" class="font-royal text-2xl sm:text-3xl text-gold">00</div>
+                <div class="text-[10px] uppercase font-sans tracking-wider mt-1 text-gray-600">Secs</div>
+              </div>
+            </div>
+          </div>
+
+          <canvas class="scratch-canvas"></canvas>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= ENGAGEMENT CEREMONY DETAILS ================= -->
+    <section id="ceremony" class="py-16 px-5">
+      <div class="max-w-3xl mx-auto">
+
+        <div class="bg-white/90 border-2 border-gold/50 rounded-3xl p-8 sm:p-12 shadow-xl text-center relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-maroon via-gold to-maroon"></div>
+
+          <span class="text-3xl inline-block mb-2">🪔</span>
+          <p class="uppercase tracking-[0.3em] text-gold text-xs sm:text-sm font-semibold">
+            The Sagai Ceremony
+          </p>
+
+          <h2 class="font-royal text-3xl sm:text-4xl text-maroon font-bold mt-2 mb-4">
+            Ring Exchange &amp; Blessings
+          </h2>
+
+          <div class="w-16 h-0.5 bg-gold mx-auto mb-6"></div>
+
+          <p class="font-serif text-xl sm:text-2xl text-maroonDark font-medium">
+            Wednesday, September 23, 2026
+          </p>
+
+          <p class="font-sans text-base text-maroon font-semibold mt-2">
+            ⏰ 11:00 AM Onwards
+          </p>
+
+          <p class="font-serif italic text-gray-600 mt-4 max-w-md mx-auto text-sm sm:text-base">
+            "A promise made for a lifetime of togetherness, laughter, and joy."
+          </p>
+
+          <div class="mt-8 pt-6 border-t border-gold/30">
+            <p class="font-serif text-xs uppercase tracking-widest text-gold mb-1 font-bold">
+              Venue
+            </p>
+            <p class="font-serif text-xl text-maroon font-bold">
+              Hotel Swosti Mandap
+            </p>
+            <p class="text-gray-600 text-sm mt-1">
+              Puri, Odisha, India
+            </p>
+
+            <a
+              href="https://maps.app.goo.gl/pn8XgKPwuexxhrVB6?g_st=iw"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 mt-5 px-6 py-2.5 rounded-full bg-maroon text-goldLight text-xs uppercase tracking-wider font-semibold hover:bg-maroonDark transition shadow-md"
+            >
+              <span>📍 Get Directions</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= GOOGLE MAPS WINDOW ================= -->
+    <section id="location" class="py-12 px-5">
+      <div class="max-w-4xl mx-auto text-center">
+
+        <p class="uppercase tracking-[0.3em] text-gold text-xs font-semibold mb-2">
+          Find Your Way
+        </p>
+        <h3 class="font-royal text-2xl sm:text-3xl text-maroon font-bold mb-6">
+          Location Map
+        </h3>
+
+        <!-- Responsive Google Maps Embed iframe -->
+        <div class="w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-gold/40 shadow-lg bg-white">
+          <iframe
+            title="Hotel Swosti Mandap Puri Location"
+            src="https://maps.google.com/maps?q=Hotel%20Swosti%20Mandap,%20Puri,%20Odisha&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Royal Footer -->
+    <footer class="bg-maroon text-goldLight py-12 px-5 text-center">
+      <h4 class="font-royal text-3xl text-goldLight font-bold">
+        Tophan &amp; Shibani
+      </h4>
+      <p class="font-serif mt-2 text-white/80 text-sm">
+        We eagerly await your gracious presence and blessings.
+      </p>
+      <div class="w-16 h-px bg-gold/40 mx-auto my-5"></div>
+      <p class="text-xs text-white/50 tracking-wider">
+        Hotel Swosti Mandap, Puri, Odisha • 23.09.2026
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* 1. PALACE DOOR SPLIT OPENING */
+    const doorOpenBtn = document.getElementById("doorOpenBtn");
+    const doorOverlay = document.getElementById("doorOverlay");
+    const mainContent = document.getElementById("mainContent");
+    const bodyEl = document.getElementById("bodyEl");
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggle = document.getElementById("musicToggle");
+
+    let musicPlaying = false;
+
+    function openPalaceDoors() {
+      doorOpenBtn.disabled = true;
+
+      // Trigger 3D split doors open
+      doorOverlay.classList.add("open");
+      mainContent.classList.add("revealed");
+      bodyEl.classList.remove("locked");
+
+      // Auto-play traditional background music
+      if (bgMusic) {
+        bgMusic.volume = 0.5;
+        bgMusic.play()
+          .then(() => {
+            musicPlaying = true;
+            musicToggle.textContent = "🔊";
+            musicToggle.classList.remove("hidden");
+          })
+          .catch(() => {
+            musicToggle.classList.remove("hidden");
+          });
+      }
+
+      // Initialize scratch card after doors open
+      setTimeout(initScratchCards, 700);
+
+      // Clean up overlay element after animation finishes
+      setTimeout(() => {
+        doorOverlay.remove();
+      }, 2200);
+    }
+
+    doorOpenBtn.addEventListener("click", openPalaceDoors);
+
+    // Music button toggle
+    musicToggle.addEventListener("click", () => {
+      if (!bgMusic) return;
+
+      if (musicPlaying) {
+        bgMusic.pause();
+        musicPlaying = false;
+        musicToggle.textContent = "🔇";
+      } else {
+        bgMusic.play()
+          .then(() => {
+            musicPlaying = true;
+            musicToggle.textContent = "🔊";
+          })
+          .catch(() => {
+            alert("Please provide an audio file at audio/shehnai-flute.mp3 (or update the audio source) to play music.");
+          });
+      }
+    });
+
+    /* 2. LIVE COUNTDOWN TIMER (Target: September 23, 2026, 11:00 AM) */
+    const engagementDate = new Date("September 23, 2026 11:00:00").getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = engagementDate - now;
+
+      if (distance <= 0) {
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = String(days).padStart(2, "0");
+      document.getElementById("hours").innerText = String(hours).padStart(2, "0");
+      document.getElementById("minutes").innerText = String(minutes).padStart(2, "0");
+      document.getElementById("seconds").innerText = String(seconds).padStart(2, "0");
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    /* 3. SCRATCH CARD TO REVEAL DATE + POPPER CONFETTI */
+    let scratchInitialized = false;
+
+    function launchCelebrationConfetti() {
+      if (typeof confetti !== "function") return;
+
+      const royalPalette = ["#B08D57", "#D4AF6A", "#6A0D25", "#F59E0B", "#FFF5EB"];
+
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { x: 0.25, y: 0.65 },
+        colors: royalPalette,
+        startVelocity: 45
+      });
+
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { x: 0.75, y: 0.65 },
+        colors: royalPalette,
+        startVelocity: 45
+      });
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 110,
+          spread: 90,
+          origin: { x: 0.5, y: 0.6 },
+          colors: royalPalette,
+          gravity: 0.8,
+          scalar: 1.1
+        });
+      }, 250);
+    }
+
+    function initScratchCards() {
+      if (scratchInitialized) return;
+      scratchInitialized = true;
+
+      document.querySelectorAll(".scratch-wrap").forEach((wrap) => {
+        const canvas = wrap.querySelector(".scratch-canvas");
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        const width = wrap.offsetWidth;
+        const height = wrap.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        ctx.scale(dpr, dpr);
+
+        function paintFoil() {
+          const grad = ctx.createLinearGradient(0, 0, width, height);
+          grad.addColorStop(0, "#ffd984");
+          grad.addColorStop(0.5, "#b08d57");
+          grad.addColorStop(1, "#7a5c30");
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+          ctx.font = "600 13px 'Montserrat', sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("✦ SCRATCH TO REVEAL DATE ✦", width / 2, height / 2);
+        }
+
+        paintFoil();
+
+        let isScratching = false;
+        let revealed = false;
+
+        function getPos(evt) {
+          const r = canvas.getBoundingClientRect();
+          return {
+            x: evt.clientX - r.left,
+            y: evt.clientY - r.top
+          };
+        }
+
+        function scratchAt(x, y) {
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.beginPath();
+          ctx.arc(x, y, 24, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        function revealPercent() {
+          const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          let cleared = 0;
+          let sampled = 0;
+          for (let i = 3; i < data.length; i += 4 * 15) {
+            sampled++;
+            if (data[i] < 60) cleared++;
+          }
+          return sampled ? cleared / sampled : 0;
+        }
+
+        function checkAutoClear() {
+          if (revealed) return;
+          if (revealPercent() > 0.38) {
+            revealed = true;
+            launchCelebrationConfetti();
+            canvas.style.transition = "opacity 0.6s ease";
+            canvas.style.opacity = "0";
+            setTimeout(() => {
+              canvas.style.pointerEvents = "none";
+            }, 600);
+          }
+        }
+
+        function start(evt) {
+          isScratching = true;
+          const p = getPos(evt);
+          scratchAt(p.x, p.y);
+        }
+
+        function move(evt) {
+          if (!isScratching) return;
+          const p = getPos(evt);
+          scratchAt(p.x, p.y);
+          checkAutoClear();
+        }
+
+        function end() {
+          isScratching = false;
+          checkAutoClear();
+        }
+
+        canvas.addEventListener("pointerdown", start);
+        canvas.addEventListener("pointermove", move);
+        window.addEventListener("pointerup", end);
+      });
+    }
+  </script>
+</body>
+</html>
